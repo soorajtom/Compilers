@@ -165,38 +165,112 @@ stored in a data structure like list
 
 val someIntFunctions = [addp 1, addp 2, addp 3];
 
-end
+(** * List functions and pattern matching
 
- (*
+In ML lists are written as follows
 
+*)
 
+val firstFewOddPrimes = [3,5,7];
 
- (* Helper function for summation *)
-
-fun sump (n:int) (x::xs) = sump (n + x) xs
-  | sump n []      = n
-
-
-(* Here is the summation function *)
-fun sum xs = sump 0 xs;
-
-(* We can partially apply functions. Very powerful technique.  *)
-val sum1   = sump 0;
 
 (*
 
+The x :: xs denotes a list with x as its first element and xs as the
+rest of the list
+
+*)
+
+val firstFewPrimes = 2 :: firstFewOddPrimes;
+
+
+(*
+
+Here is an example of a list function that applies a given function to
+all the elements on the list
+
+*)
+
+fun map f []         = []
+  | map f (x :: xs)  = f x :: map f xs;
+
+
+(*
+
+Let us see what happens if we increment the primes: Silly program
+but illustrates the use of map and partial application.
+
+*)
+
+val useless = map incr firstFewPrimes;
+
+val somemorestuff = map (addp 42) firstFewPrimes; (* See the use of currying *)
+
+
+(* Another function that is very useful  for processing lists are folds
+
 fold f a [b0, b1 , b2, b3 ...] = f (f a b0) b1 ....
 
-Think of f as an operator we have
+Think of op as an operator we have
 
-fold * a [b0,b1,b2 ...] = ((a * b0) * b1) * b2 ...
+fold op a [b0,b1,b2 ...] = ((a op b0) op b1) op b2 ...
 
 corresponds to the library function foldl
+
 *)
 
 
 fun fold _ x []      = x
   | fold f x (y::ys) = fold f (f x y) ys;
+
+
+(* Let us write a function to sum up a list of numbers. Notice that this is just a fold *)
+
+val sum = fold addp 0;  (* sum [x1,x2,x3..] = ((0+x1) + x2) ....) *)
+
+
+(*
+
+Let us write the product function which takes a product of the
+list. Again it turns out to be just a fold
+
+*)
+
+val prod = let fun mul x y = x * y
+	   in fold mul 1
+	   end;
+
+(*
+
+ We can use this to define factorial for which we first define the
+ enumerate function
+
+*)
+
+fun enum a b = if a <= b
+	       then a :: enum (a + 1) b
+               else [];
+
+fun factorial n = prod (enum 1 n);
+
+val fct = prod o enum 1;  (* using function composition o *)
+
+
+end
+
+
+(*
+
+Exercise: Our "folding" is from left, we could define a right fold as
+well which does the folding from right
+
+i.e  fold op [a,b,c,...z] b =  a op (b op ... (y op (z op b)))
+
+
+If the operator o is not commutative this can be different.
+
+The standard library has its own variants of foldr and foldl but they
+accept the functions in uncurried form. Have a look at their types.
 
 
 *)
