@@ -1,0 +1,10 @@
+language: none
+env:
+build:
+  pre_ci_boot:
+    image_name: piyushkurur/compilers
+    image_tag: latest
+    pull: true
+    options: "-e HOME=/root"
+  ci:
+    - echo "All is well"
