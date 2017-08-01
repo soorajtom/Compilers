@@ -8,5 +8,4 @@ build:
     pull: true
     options: "-e HOME=/root"
   ci:
-    - echo "All is well"
     - for dir in $BUILD_DIRS; do pushd .; cd "$dir"; ./build.sh; popd; done
