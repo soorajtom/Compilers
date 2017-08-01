@@ -1,5 +1,6 @@
 #!/bin/sh
 
+set -e
 
 echo ---------------  Building with SML/NJ -----------------------------
 ml-build hello.cm Hello.main hello-image
