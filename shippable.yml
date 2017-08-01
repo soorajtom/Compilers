@@ -1,5 +1,6 @@
 language: none
 env:
+  - BUILD_DIRS=programming-in-ml/standalone-program
 build:
   pre_ci_boot:
     image_name: piyushkurur/compilers
@@ -8,3 +9,4 @@ build:
     options: "-e HOME=/root"
   ci:
     - echo "All is well"
+    - for dir in $BUILD_DIRS; do pushd .; ./"$dir"/build.sh; popd; done
