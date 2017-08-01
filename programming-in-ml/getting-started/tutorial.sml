@@ -255,6 +255,16 @@ fun factorial n = prod (enum 1 n);
 
 val fct = prod o enum 1;  (* using function composition o *)
 
+(*
+
+Let us end by writing a main function that is the entry point for our
+tutorial.
+
+*)
+
+fun main _ = let val (question,answer) = aPair
+	     in map print [question, ": ", (Int.toString answer), "\n"]; 0 end;
+
 
 end
 

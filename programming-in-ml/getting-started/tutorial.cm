@@ -2,3 +2,4 @@ Library
 	structure Tutorial
 is
 	tutorial.sml
+	$/basis.cm
