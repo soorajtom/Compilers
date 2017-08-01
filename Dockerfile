@@ -3,7 +3,7 @@
 #
 # Used also for CI on shippable.
 
-FROM ubuntu:14.04
+FROM ubuntu:latest
 MAINTAINER Piyush P Kurur <ppk@cse.iitk.ac.in>
 
 # Versions of some haskell packages to pre-install
