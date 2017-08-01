@@ -1,6 +1,6 @@
 language: none
 env:
-  - BUILD_DIRS=programming-in-ml/standalone-program
+  - BUILD_DIRS=programming-in-ml/standalone-program programming-in-ml/getting-started
 build:
   pre_ci_boot:
     image_name: piyushkurur/compilers
