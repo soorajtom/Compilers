@@ -29,3 +29,10 @@ not very efficient. Mlton is meant for standalone compilation and the
 executable is very performant. However, compilation takes a lot of
 time and space. Moreover, it does not have an interactive interpreter
 for quick development.
+
+## Standalone executable with SML/NJ
+
+You can create a heap image with ml-build and later on load
+it. However, this is still interpreted and beware of the change of
+command line arguments (the prgram name will be your smlnj iterpreter. See
+the companion build.sh script for how this is done.
