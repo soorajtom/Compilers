@@ -9,4 +9,4 @@ build:
     options: "-e HOME=/root"
   ci:
     - echo "All is well"
-    - for dir in $BUILD_DIRS; do pushd .; ./"$dir"/build.sh; popd; done
+    - for dir in $BUILD_DIRS; do pushd .; cd "$dir"; ./build.sh; popd; done
