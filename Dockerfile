@@ -21,4 +21,4 @@ RUN sudo apt-get update -y
 
 # Install some basic packages that are required by the haskell
 # environment.
-RUN sudo apt-get smlnj ml-yacc ml-lex ml-burg mlton
+RUN sudo apt-get install smlnj ml-yacc ml-lex ml-burg mlton
