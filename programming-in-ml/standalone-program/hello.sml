@@ -12,6 +12,6 @@ struct
 fun main (name,args) = let val _ = print "Hello world\n"
 	                   val _ = print ("program name: " ^ name ^ "\nArguments:\n")
 			   val _ = List.map (fn x => print ("    " ^ x ^ "\n")) args
-		       in 1 end;
+		       in 0 end;
 
 end
