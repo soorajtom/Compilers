@@ -7,7 +7,7 @@ FROM ubuntu:latest
 MAINTAINER Piyush P Kurur <ppk@cse.iitk.ac.in>
 
 RUN apt-get update -y
-RUN apt-get install sudo -y
+RUN apt-get install sudo locales -y
 # RUN sudo apt-get install software-properties-common -y
 
 # Generate the locales.
