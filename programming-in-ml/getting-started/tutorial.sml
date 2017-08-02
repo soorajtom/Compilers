@@ -32,17 +32,17 @@ struct
 
 (* Values and their types *)
 
-val aString     = "Hello  world";
-val aChar       = #"c";
-val aBool       = true;
-val anotherBool = false;
-val anInt       = 42;
-val aReal       = 42.0;
+val aString     = "Hello  world"
+val aChar       = #"c"
+val aBool       = true
+val anotherBool = false
+val anInt       = 42
+val aReal       = 42.0
 val aList       = [1,2,3]
 
-val aPair       = ("the answer to life, universe, and everything", 42);
-val aTriple     = (1, 2.4, "hello");
-val aUnit       = (); (* empty product type *)
+val aPair       = ("the answer to life, universe, and everything", 42)
+val aTriple     = (1, 2.4, "hello")
+val aUnit       = () (* empty product type *)
 
 (*
 
@@ -65,7 +65,7 @@ constant of type real * real.
 
 *)
 
-val origin : real * real = (0.0, 0.0);
+val origin : real * real = (0.0, 0.0)
 
  (* Exercise: What happens with the following definition ? *)
  (* val origin : real * real = (0.0, "0.0") *)
@@ -73,10 +73,10 @@ val origin : real * real = (0.0, 0.0);
 
 
  (* We can give new names to types. This is called type aliasing  *)
-type vector2d = real * real;
+type vector2d = real * real
 
-val unitx : vector2d = (1.0,0.0);          (* unit vector along x-axis *)
-val unity : vector2d = (0.0,1.0);          (* unit vector along y-axis *)
+val unitx : vector2d = (1.0,0.0)          (* unit vector along x-axis *)
+val unity : vector2d = (0.0,1.0)          (* unit vector along y-axis *)
 
 
 
@@ -94,7 +94,7 @@ on x is just f x
 *)
 
 fun fact n = if n <= 0 then 1
-	     else n * fact (n - 1); (* Notice the recursive use of fact *)
+	     else n * fact (n - 1) (* Notice the recursive use of fact *)
 
 (** The idea of currying.
 
@@ -103,16 +103,16 @@ look at the following variants of add.
 
 *)
 
-fun add (u,v) = u + v;
-fun addp u v  = u + v;
+fun add (u,v) = u + v
+fun addp u v  = u + v
 
 (*
 
 Both the functions only take one argument each:
 
-val add : int * int -> int;
+val add : int * int -> int
 
-val addp : int -> (int -> int);
+val addp : int -> (int -> int)
 
 The first variant takes a parameter of type (int * int), i.e. a tuple
 and returns an int.  The second variant takes a single int parameter
@@ -129,7 +129,7 @@ addition.
 
 *)
 
-val increment = addp 1;
+val increment = addp 1
 
 (*
 
@@ -146,13 +146,13 @@ vice-versa as follows.
 *)
 
 
-fun curry   f  x y  = f (x,y);	(* convert to curried form   *)
-fun uncurry f (x,y) = f x y;    (* convert to uncurried form *)
+fun curry   f  x y  = f (x,y)	(* convert to curried form   *)
+fun uncurry f (x,y) = f x y    (* convert to uncurried form *)
 
 
-val addp1 = curry  add;           (* Notice the use of val instead of fun *)
-val incr  = addp1 1;
-val add1  = uncurry addp;
+val addp1 = curry  add           (* Notice the use of val instead of fun *)
+val incr  = addp1 1
+val add1  = uncurry addp
 
 
 (*
@@ -163,7 +163,7 @@ stored in a data structure like list
 
 *)
 
-val someIntFunctions = [addp 1, addp 2, addp 3];
+val someIntFunctions = [addp 1, addp 2, addp 3]
 
 (** * List functions and pattern matching
 
@@ -171,7 +171,7 @@ In ML lists are written as follows
 
 *)
 
-val firstFewOddPrimes = [3,5,7];
+val firstFewOddPrimes = [3,5,7]
 
 
 (*
@@ -181,7 +181,7 @@ rest of the list
 
 *)
 
-val firstFewPrimes = 2 :: firstFewOddPrimes;
+val firstFewPrimes = 2 :: firstFewOddPrimes
 
 
 (*
@@ -192,7 +192,7 @@ all the elements on the list
 *)
 
 fun map f []         = []
-  | map f (x :: xs)  = f x :: map f xs;
+  | map f (x :: xs)  = f x :: map f xs
 
 
 (*
@@ -202,9 +202,9 @@ but illustrates the use of map and partial application.
 
 *)
 
-val useless = map incr firstFewPrimes;
+val useless = map incr firstFewPrimes
 
-val somemorestuff = map (addp 42) firstFewPrimes; (* See the use of currying *)
+val somemorestuff = map (addp 42) firstFewPrimes (* See the use of currying *)
 
 
 (* Another function that is very useful  for processing lists are folds
@@ -221,12 +221,12 @@ corresponds to the library function foldl
 
 
 fun fold _ x []      = x
-  | fold f x (y::ys) = fold f (f x y) ys;
+  | fold f x (y::ys) = fold f (f x y) ys
 
 
 (* Let us write a function to sum up a list of numbers. Notice that this is just a fold *)
 
-val sum = fold addp 0;  (* sum [x1,x2,x3..] = ((0+x1) + x2) ....) *)
+val sum = fold addp 0  (* sum [x1,x2,x3..] = ((0+x1) + x2) ....) *)
 
 
 (*
@@ -238,7 +238,7 @@ list. Again it turns out to be just a fold
 
 val prod = let fun mul x y = x * y
 	   in fold mul 1
-	   end;
+	   end
 
 (*
 
@@ -249,11 +249,11 @@ val prod = let fun mul x y = x * y
 
 fun enum a b = if a <= b
 	       then a :: enum (a + 1) b
-               else [];
+               else []
 
-fun factorial n = prod (enum 1 n);
+fun factorial n = prod (enum 1 n)
 
-val fct = prod o enum 1;  (* using function composition o *)
+val fct = prod o enum 1  (* using function composition o *)
 
 (*
 
@@ -263,7 +263,7 @@ tutorial.
 *)
 
 fun main _ = let val (question,answer) = aPair
-	     in map print [question, ": ", (Int.toString answer), "\n"]; 0 end;
+	     in map print [question, ": ", (Int.toString answer), "\n"]; 0 end
 
 
 end
