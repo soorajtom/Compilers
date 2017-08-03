@@ -9,3 +9,4 @@ build:
     options: "-e HOME=/root"
   ci:
     - for dir in $BUILD_DIRS; do pushd .; cd "$dir"; ./build.sh; popd; done
+    - make -C reverse-polish test
