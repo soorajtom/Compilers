@@ -7,9 +7,12 @@ SOURCES=ast.sml machine.sml rp.sml
 %.lex.sml: %.lex
 	mllex $<
 all: rp
-PHONY: all clean
+PHONY: all clean test
 clean:
 	rm -f *.lex.sml rp
 
 rp: rp.lex.sml rp.mlb ${SOURCE}
 	mlton rp.mlb
+
+test: all
+	rp test.inp
