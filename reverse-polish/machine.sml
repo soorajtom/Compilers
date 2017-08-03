@@ -37,9 +37,6 @@ fun printstack stack = let val conts = String.concatWith ", " (List.map Int.toSt
 fun printtop (x::xs) = (print (Int.toString x ^ "\n"); flushit)
   | printtop _       = (print "error: empty stack\n"; flushit)
 
-
-
-
 fun step (Push x)     stack           = x :: stack
   | step PrintStack   stack           = (printstack stack; stack)
   | step PrintTop     stack           = (printtop stack; stack)
