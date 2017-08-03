@@ -13,41 +13,39 @@ struct
 
 (* The instructions of the machine *)
 
-datatype Inst    = Exec of Ast.BinOp | Push of int | Print;
-type     Program = Inst list;
+datatype Inst    = Exec of Ast.BinOp | Push of int | ClearStack | PrintTop | PrintStack
+type     Program = Inst list
 
-
-(*
-
-Printing the program for use with another reverse polish calculator
-like dc.
-
-*)
-
-fun opToString Ast.Plus  = "+"
-  | opToString Ast.Minus = "-"
-  | opToString Ast.Mul   = "*";
-
-fun instToString (Exec oper) = opToString oper
-  | instToString (Push x   ) = Int.toString x
-  | instToString Print       = "p"
-
-val toString = String.concatWith " " o List.map instToString;
 
 (* Run the stack machine *)
-type     Stack   = int list;
+type     Stack   = int list
+val flushit = TextIO.flushOut TextIO.stdOut
 
 fun stackUnderflow stack = (print "error: stack underflow" ; OS.Process.exit (OS.Process.failure); stack)
+fun printstack stack = let val conts = String.concatWith ", " (List.map Int.toString stack)
+		       in print ("[" ^ conts ^ "]\n"); flushit
+		       end
 
-fun printtop (top::rest) = (print (Int.toString top); top::rest)
-  | printtop stack       = stackUnderflow stack
+fun printtop (x::xs) = (print (Int.toString x ^ "\n"); flushit)
+  | printtop _       = (print "error: empty stack\n"; flushit)
 
 
-fun step (Push x)    stack            = x :: stack
-  | step Print       stack            = printtop stack
+
+
+fun step (Push x)     stack           = x :: stack
+  | step PrintStack   stack           = (printstack stack; stack)
+  | step PrintTop     stack           = (printtop stack; stack)
+  | step ClearStack   _               = []
   | step (Exec oper) (a :: b :: rest) = Ast.binOpDenote oper a b :: rest
   | step _           stack            = stackUnderflow stack
 
+
 val run = List.foldl (fn (inst,stack) => step inst stack) []
+
+fun runWithLexer lexer = let fun loop stack = case lexer () of
+						  NONE      => ()
+					       |  SOME inst => loop (step inst stack)
+			 in loop []
+			 end
 
 end
