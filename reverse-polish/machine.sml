@@ -16,6 +16,14 @@ struct
 datatype Inst    = Exec of Ast.BinOp | Push of int | ClearStack | PrintTop | PrintStack
 type     Program = Inst list
 
+fun instToString (Exec oper) = Ast.binOpToString oper
+  | instToString (Push x   ) = Int.toString x
+  | instToString ClearStack  = "c"
+  | instToString PrintTop    = "p"
+  | instToString PrintStack  = "s"
+
+val programToString = String.concatWith " " o List.map instToString
+
 
 (* Run the stack machine *)
 type     Stack   = int list
@@ -39,7 +47,6 @@ fun step (Push x)     stack           = x :: stack
   | step (Exec oper) (a :: b :: rest) = Ast.binOpDenote oper a b :: rest
   | step _           stack            = stackUnderflow stack
 
-
 val run = List.foldl (fn (inst,stack) => step inst stack) []
 
 fun runWithLexer lexer = let fun loop stack = case lexer () of
@@ -47,5 +54,4 @@ fun runWithLexer lexer = let fun loop stack = case lexer () of
 					       |  SOME inst => loop (step inst stack)
 			 in loop []
 			 end
-
 end
