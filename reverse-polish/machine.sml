@@ -46,9 +46,4 @@ fun step (Push x)     stack           = x :: stack
 
 val run = List.foldl (fn (inst,stack) => step inst stack) []
 
-fun runWithLexer lexer = let fun loop stack = case lexer () of
-						  NONE      => ()
-					       |  SOME inst => loop (step inst stack)
-			 in loop []
-			 end
 end

@@ -39,7 +39,15 @@ when we want to pipe the output to rp.
 *)
 
 
+(* Running with a lexer *)
+fun runWithLexer lexer = let fun loop stack = case lexer () of
+						  NONE      => ()
+					       |  SOME inst => loop (Machine.step inst stack)
+			 in loop []
+			 end
+
+
 val _ = case CommandLine.arguments() of
-	    [] => Machine.runWithLexer interactive
-	 |  xs => (List.map (Machine.runWithLexer o lexfile) xs; ())
+	    [] => runWithLexer interactive
+	 |  xs => (List.map (runWithLexer o lexfile) xs; ())
 end
