@@ -3,8 +3,15 @@
 This is a reverse polish calculator. This is meant to be compiled into
 a standalone executable using mlton. The reverse polish calculator
 described here usually takes multi-line integer expressions in reverse
-polish notation and converts it into
+polish notation and converts it into.
 
+Besides the operators +, *, and -, the calculator understands the
+following command.
+
+p - print the top of the stack
+s - print the entire stack
+c - clear the stack.
+# - starts a line comment. Ends when the line ends.
 
 *)
 
