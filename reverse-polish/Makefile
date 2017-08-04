@@ -15,4 +15,4 @@ rp: rp.lex.sml rp.mlb ${SOURCE}
 	mlton rp.mlb
 
 test: all
-	rp test.inp
+	${CURDIR}/rp test.inp
