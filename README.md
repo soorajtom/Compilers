@@ -24,9 +24,25 @@ tracker. Remember that the issue tracker is public and any one can see
 the discussions therein. This has privacy implications and you might
 not want to discuss things like your grade.
 
+## Testing your setup
 
+We have included some tests in the source files. You can run this
+using the the make command. This will ensure that you have setup your
+machine correctly with the correct softwares for this course. These
+tests are run by the [Shippable CI][shippable] every pushes into this
+repository.
+
+```
+make test   # run the tests on the sample programs here.
+make clean  # cleanup the directories of temporary files.
+
+```
+
+The [shippable builds][shippable] are run on a docker container which
+is build out of the Dockerfile given in this directory.
 
 [status]: <https://api.shippable.com/projects/59800285202dac07006dad2e/badge?branch=master> "Build Status"
 [Course Repository]: <https://bitbucket.org/piyush-kurur/compilers>
 [Course Wiki]:       <https://bitbucket.org/piyush-kurur/compilers/wiki/Home>
 [Issue tracker]:     <https://bitbucket.org/piyush-kurur/compilers/issues>
+[shippable]: <https://app.shippable.com/bitbucket/piyush-kurur/compilers/> "Shippable CI page"
