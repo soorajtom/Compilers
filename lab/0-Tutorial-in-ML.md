@@ -43,20 +43,16 @@ val it = 40 : int
 Write SML functions/datatypes for the following tasks.
 
 1. Define a data type for binary tree.
-
 ```
 datatype 'a Tree = ...
 
 ```
-
 2. Write a function `inorder` that lists the tree in inorder.
 
 ```
 val inorder : 'a Tree -> 'a list
 ```
-
 3. Write a function to rotate a tree anti-clockwise at the root.
-
 ```
 val anticlockwise : 'a Tree -> 'a Tree
 ```
