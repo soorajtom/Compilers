@@ -1,6 +1,4 @@
 language: none
-env:
-  - BUILD_DIRS="programming-in-ml/standalone-program programming-in-ml/getting-started"
 build:
   pre_ci_boot:
     image_name: piyushkurur/compilers
@@ -8,5 +6,4 @@ build:
     pull: true
     options: "-e HOME=/root"
   ci:
-    - for dir in $BUILD_DIRS; do pushd .; cd "$dir"; ./build.sh; popd; done
-    - make -C reverse-polish test
+    - make test
