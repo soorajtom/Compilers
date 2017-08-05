@@ -165,6 +165,44 @@ stored in a data structure like list
 
 val someIntFunctions = [addp 1, addp 2, addp 3]
 
+(*
+
+If functions are truely first class there should be a way of creating
+functions without defining them using a `fun` definition. ML allows us
+to that using what are (now) known as anonymous functions. Such
+functions were first explored by Church in his lambda calculus
+(https://en.wikipedia.org/wiki/Lambda_calculus).
+
+*)
+
+
+val increment = fn x => x + 1 (* we revisit the increment function *)
+
+(*
+
+The ML expression `fn x => (...x...)` is that function that maps its
+argument x to (...x...)  With annonymous function, we can rewrite some
+functions definitions. For example, the following definitions all mean
+the same thing.
+
+fun f a b c = e
+fun f a b   = fn c => e
+fun f a     = fn b => fn c => e
+val f       = fn a => fn b => fn c => e
+
+
+Exercise: Rewrite curry and uncurry using annonymous
+functions. i.e. Fill in the blanks below.
+
+fun curry f x = fn ....
+fun curry f   = fn ....
+val curry     = .....
+
+fun uncurry f = fn ....
+val uncurry   = .....
+
+*)
+
 (** * List functions and pattern matching
 
 In ML lists are written as follows
