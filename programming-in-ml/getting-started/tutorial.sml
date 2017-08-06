@@ -295,20 +295,6 @@ val fct = prod o enum 1  (* using function composition o *)
 
 (*
 
-Let us end by writing a main function that is the entry point for our
-tutorial.
-
-*)
-
-fun main _ = let val (question,answer) = aPair
-	     in map print [question, ": ", (Int.toString answer), "\n"]; 0 end
-
-
-end
-
-
-(*
-
 Exercise: Our "folding" is from left, we could define a right fold as
 well which does the folding from right
 
@@ -322,3 +308,46 @@ accept the functions in uncurried form. Have a look at their types.
 
 
 *)
+
+
+
+(*  Parameteric Polymorphism.
+
+We already seen the smartness of  the sml compiler/interpreter in infering
+the type of your values/functions from the context. If you look at the type
+that the compiler infered for your map function you would have noticed something
+strange.
+
+val map = fn:  ('a -> 'b) -> 'a list -> 'b list.
+
+Here the 'a and 'b are type variables, i.e. can be any type you
+wish. In plain English it means the following: Let 'a and be 'b be any
+types. map takes a function from 'a to 'b to a function that map an 'a
+list to 'b list.  The 'a list type itself is polymorphic and sml has
+interpreted the most general type for the map function that is
+consistant with its definition. This kind of polymorphism is called
+parametric polymorphism in the sense that map is a generic list maping
+function that works no matter what the types 'a and 'b are.
+
+Internally, sml infers the "most general type" by solving a set of
+constraints that arise by the definition. If it is not able to solve
+it means that there is a type error. Here are some simple examples.
+
+*)
+
+fun identity x    = x         (* val id :  'a -> 'a                                 *)
+fun constant x y  = x         (* val const : 'a -> 'b -> 'a                         *)
+fun compose f g x =  f (g x)  (* val compose : ('b -> 'c) -> ('a -> 'b) -> 'a -> 'c *)
+
+
+(*
+
+Let us end by writing a main function that is the entry point for our
+tutorial.
+
+*)
+
+fun main _ = let val (question,answer) = aPair
+	     in map print [question, ": ", (Int.toString answer), "\n"]; 0 end
+
+end
