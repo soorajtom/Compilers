@@ -340,6 +340,149 @@ fun constant x y  = x         (* val const : 'a -> 'b -> 'a                     
 fun compose f g x =  f (g x)  (* val compose : ('b -> 'c) -> ('a -> 'b) -> 'a -> 'c *)
 
 
+(** Algebraic data types.
+
+Algebraic data type allows us to captures abstract syntax of languages
+pretty easily and thus are particularly well suited for writing
+compilers. We start with few examples.
+
+*)
+
+datatype Colour = Red | Blue | Green
+
+datatype DaysOfTheWeek = Sunday | Monday | Tuesday | Wednessday | Thursday | Friday | Saturday
+
+
+(*
+
+Algebraic data types capture types that are defined by a (finite) set
+of rules or cases which build the type from simpler objects. The rules
+or cases are distinguished by the constructors of the types. For
+example, the colours datatype says that a colour is formed by three
+rules distinguished by the constructors Red, Blue and Green. In the
+case of DaysOfTheWeek there are 7 constructors.
+
+The constructors have two roles. Firstly, they create values of that
+type.
+
+*)
+
+
+val skyColour    = Blue   (* skyColour has type Colour *)
+val favouriteDay = Sunday (* favouriteDay has type DaysOfTheWeek *)
+
+
+(*
+
+The constructors of a type is also used to define functions from the
+type by using what is known as pattern matching as given below.
+
+*)
+
+fun isHoliday Sunday = true
+  | isHoliday _      = false
+
+(*
+
+   The above function says which of the days of the week is a
+   holiday. It should be read as follows as a set of two rules.
+
+   1. Sunday is a holiday
+   2. Anything else is not.
+
+
+   You can think of the function as trying out each of the cases and
+   seeing which of the cases match. Here, _ is a match everything
+   pattern often called wildcard pattern.
+
+*)
+
+(** * Recursive types
+
+   Algebraic data types can be recursive and can define very
+   interesting data types. Let us define the list type ourselves even
+   though the standard library already has one. Let us fix a type 'a
+   (notice the polymorphism). Mathematically a list is defined using
+   two rules.
+
+   1. An empty list is a list. Call this the nil rule
+   2. If xs is an 'a list and x is of type 'a then the tuple (x, xs)
+      is a list. Call this the cons rule.
+
+   We can capture this in ML as follows.
+
+ *)
+
+
+datatype 'a mylist = nil
+		   | cons of ('a * 'a mylist)
+
+
+(* We can define functions again by pattern matching. *)
+fun isEmpty nil = true
+  | isEmpty _   = false
+
+fun listLength nil            = 0
+  | listLength (cons (_,xs))  = 1 + listLength xs
+
+(*
+
+The listLength function can be seen as defining the length of the list
+using two rules
+
+1. The length of a nil list is 0
+
+2. The length of a list of the kind (x,xs) is 1 + the length of the
+list xs.
+
+The only difference between our list and the standard list there is
+some syntactic sugar where [] is for nil and the infix constructor ::
+for cons.
+
+*)
+
+(* In general an algebraic datatype will look like this
+
+datatype 'a1 'a2 'a3 Name = C1 of (...) | C2 of (...) | C3 ...
+
+Here C1, C2 C3 etc are constructors.
+
+
+A pattern for the datatype would look like
+
+1. _ a wild card which matches any value
+
+2. x which like the wild card matches any value but it also binds the
+value to the variable x so you can use x on the right hand side of the
+definition.
+
+3. C p1 p2 p3 p4 .. where C is a constructor and p1, p2 ... are patterns.
+
+This will match any value that looks like the constructor C applied on
+e1 e2 e3 e4 ...  where p1 matches e1, p2 matches e2 etc.
+
+A function defined using a list of pattern matching rules "tries" each
+pattern and gives out the value corresponding to the first case that
+matched.
+
+The option type is a useful datatype defined in standard library that
+is used to signal optional result. They capture a lot of logic that
+involves the use of the unsafe null values (null pointer in C, null in
+Java). They are defined as
+
+datatype 'a option = SOME of 'a | NONE
+
+We use this to define the head and tail of a list.
+
+ *)
+
+fun head []         = NONE
+  | head (x::_)     = SOME x
+
+fun tail []         = NONE
+  | tail (_ :: xs)  = SOME xs
+
+
 (*
 
 Let us end by writing a main function that is the entry point for our
