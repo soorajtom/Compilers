@@ -482,6 +482,18 @@ fun head []         = NONE
 fun tail []         = NONE
   | tail (_ :: xs)  = SOME xs
 
+(*
+
+Pattern matching using case expression.
+
+Sometimes it is natural define values using pattern matching cases as
+the following rewrite of head illustrates.
+
+*)
+
+fun head1 xs = case xs of
+		   []      => NONE
+		 | x :: xs => SOME x
 
 (*
 
