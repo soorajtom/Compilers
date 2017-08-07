@@ -450,16 +450,24 @@ Here C1, C2 C3 etc are constructors.
 
 A pattern for the datatype would look like
 
-1. _ a wild card which matches any value
+1. A wild card pattern `_` (underscore) which matches any value
 
-2. x which like the wild card matches any value but it also binds the
-value to the variable x so you can use x on the right hand side of the
-definition.
+2. A variable pattern say `x` which like the wild card matches any
+value but it also binds the value to the variable `x` so that x can be
+used on the right hand side of the definition.
 
-3. C p1 p2 p3 p4 .. where C is a constructor and p1, p2 ... are patterns.
+3. C p where C is a constructor and p is some pattern. This will
+   match any value that looks like the constructor C applied on an
+   expression e ...  where the pattern p matches e.
 
-This will match any value that looks like the constructor C applied on
-e1 e2 e3 e4 ...  where p1 matches e1, p2 matches e2 etc.
+Just like values, the tuples and lists have special patters.
+
+
+1. Built in patterns for list like ([]), (p1 :: p2), and sequences of
+   patterns like [p], [p1,p2], [p1,p2,p3] etc.  where pi's are
+   themselves patterns.
+
+2. Built in pattern for tuples like (), (p), (p1,p2) etc.
 
 A function defined using a list of pattern matching rules "tries" each
 pattern and gives out the value corresponding to the first case that
