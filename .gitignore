@@ -1,6 +1,6 @@
 .cm
-*.yacc.desc
-*.yacc.sig
-*.yacc.sml
+*.grm.desc
+*.grm.sig
+*.grm.sml
 *.lex.sml
 *.x86-linux
