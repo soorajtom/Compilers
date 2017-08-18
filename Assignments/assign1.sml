@@ -15,26 +15,40 @@ end
 structure RealORD : ORD =
 struct
 	
-	type t = real
+	type t = real;
 	val le: t -> t -> bool =fn a => fn b => (a <= b);
 
 end
 
 
-signature sort =
+signature Sort =
 sig
-	type a
-	val qsort : a -> a
+	type ltype
+	val sort : ltype -> ltype
 end
 
-(* functor : structure * structure -> structure *)
+(* functor : structure * ... * structure -> structure *)
 
-functor Qsort (IntORD : ORD, 
+functor Qsort (z : ORD): Sort =
 
 struct
-	type a = List;
-	fun qsort (a
+	type ltype = z.t list;
+	fun sort (x :: xs):ltype = let val (a, b) = 
+			List.partition (z.le x) xs in sort b @ [x] @ sort a 
+			end
+	   |sort k:ltype = k;
+	
 end
+
+structure intsort = Qsort(IntORD);
+
+
+
+
+
+
+
+
 
 
 
