@@ -1,18 +1,27 @@
 # Makefile to build all standalone programs.
 #
 
-SOURCES=ast.sml machine.sml rp.sml
-
+COMMON=ast.sml machine.sml
 
 %.lex.sml: %.lex
 	mllex $<
-all: rp
+
+%.grm.sml: %.grm
+	mlyacc $<
+all: rp ec
+
 PHONY: all clean test
 clean:
 	rm -f *.lex.sml rp
+	rm -f *.grm.sml *.grm.desc *.grm.sig ec
 
-rp: rp.lex.sml rp.mlb ${SOURCE}
+rp: rp.lex.sml rp.mlb rp.sml ${COMMON}
 	mlton rp.mlb
+
+ec: ec.sml ec.mlb expr.grm.sml expr.lex.sml ${COMMON} translate.sml
+	mlton ec.mlb
+
 
 test: all
 	${CURDIR}/rp test.inp
+	${CURDIR}/ec test.expr | ${CURDIR}/rp

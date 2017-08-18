@@ -10,6 +10,11 @@ datatype Expr  = Const of int
 	       | Op    of Expr * BinOp * Expr;
 
 
+(* Some helper functions *)
+fun plus  a b = Op (a, Plus, b)
+fun minus a b = Op (a, Minus, b)
+fun mul   a b = Op (a, Mul, b)
+
 (* meaning of binary operators *)
 fun binOpDenote Plus  x y = x + y
   | binOpDenote Minus x y = x - y

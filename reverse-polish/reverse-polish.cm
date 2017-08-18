@@ -6,4 +6,6 @@ is
   ast.sml
   machine.sml
   translate.sml
+  expr.grm
+  expr.lex
   $/basis.cm
