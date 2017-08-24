@@ -9,7 +9,7 @@ understanding of structures is required.
 Here is a quick guide for SML structures.
 
 
-## Assignment 1: The Tree module.
+## Assignment 1: Ordering and Sorting.
 
 
 Consider the following signature for ordered element
