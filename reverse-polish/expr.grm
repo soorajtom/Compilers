@@ -16,8 +16,9 @@
        | EXPS    of Ast.Expr list
        | PROGRAM of Ast.Expr list
 
-%left PLUS MINUS
 %left MUL
+%left PLUS MINUS
+
 (* The type that captures position in the input *)
 %pos int
 %%
