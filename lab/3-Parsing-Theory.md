@@ -1,4 +1,4 @@
-# Parsing theory
+# Parsing theory (Deadline: September 22, 2017).
 
 In the class, we studied the theory behind writing parsers for
 programming language. This lab-session is aimed at consolidating that
