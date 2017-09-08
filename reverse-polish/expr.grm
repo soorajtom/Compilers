@@ -1,8 +1,13 @@
+(* This is the preamble where you can have arbitrary sml code. For us
+it is empty *)
+
 %%
+
 %eop EOF
 %verbose
 %pure
 %name Expr
+
 (* The terminals or tokens of the language *)
 %term CONST of int
     | PLUS
@@ -18,10 +23,22 @@
 
 %left MUL
 %left PLUS MINUS
+(*
+
+Operator precedence and associativity. The %left says the operator is
+left associative and the precedence increase as you go down this list.
+
+*)
+
+%left PLUS MINUS  (* + and - are of same precedence *)
+%left MUL         (* higher than + and -            *)
+>>>>>>> e8f8a742344a12e69c84b014667302ecfd929592
 
 (* The type that captures position in the input *)
 %pos int
+
 %%
+
 PROGRAM : EXPS                 ( EXPS )
 	| EXPS NEWLINE         ( EXPS )
 EXPS    : EXP NEWLINE EXPS     ( EXP :: EXPS         )

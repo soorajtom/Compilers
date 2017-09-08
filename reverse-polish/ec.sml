@@ -2,6 +2,7 @@
 structure EC =
 struct
 
+(* This three structure definitions are what the lexer and parser *)
 
 structure ExprLrVals = ExprLrValsFun(structure Token = LrParser.Token) (* Generate the LR values structure *)
 structure ExprLex    = ExprLexFun(structure Tokens = ExprLrVals.Tokens)
@@ -27,6 +28,8 @@ val thisLexer = case CommandLine.arguments() of
 
 fun print_error (s,i:int,_) = TextIO.output(TextIO.stdErr,
 					    "Error, line " ^ (Int.toString i) ^ ", " ^ s ^ "\n")
+
+(* The portion of the code that does the actual compiling *)
 
 val (program,_) = ExprParser.parse (0,thisLexer,print_error,())
 val executable  = Translate.compile program
