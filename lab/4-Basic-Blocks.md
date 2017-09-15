@@ -3,7 +3,6 @@
 1. Formulate an ML data type to capture directed graphs required to
    implement dataflow analysis for the graph. You can start with trying to
    implement a structure with the following signature.
-
 ```
 signature Graph = sig
 
@@ -17,7 +16,6 @@ signature Graph = sig
 	val pred    : graph       -> node list
 
 end
-
 ```
 
 2. Write a general algorithm for computing the basic blocks in a
