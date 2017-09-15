@@ -3,20 +3,20 @@
 1. Formulate an ML data type to capture directed graphs required to
    implement dataflow analysis for the graph. You can start with trying to
    implement a structure with the following signature.
-```
-signature Graph = sig
+   ```
+   signature Graph = sig
 
-    eqtype node
-	type   graph     (* mutable variant of a graph *)
+	  eqtype node
+	  type   graph     (* mutable variant of a graph *)
 
-	val newNode : graph       -> node
-	val addEdge : (node,node) -> graph -> ()
-	val nodes   : graph       -> node list
-	val suc     : graph       -> node list
-	val pred    : graph       -> node list
+	  val newNode : graph       -> node
+	  val addEdge : (node,node) -> graph -> ()
+	  val nodes   : graph       -> node list
+	  val suc     : graph       -> node list
+	  val pred    : graph       -> node list
 
-end
-```
+   end
+   ```
 
 2. Write a general algorithm for computing the basic blocks in a
    directed graph with the above signature.
