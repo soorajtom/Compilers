@@ -41,6 +41,18 @@ make clean  # cleanup the directories of temporary files.
 The [shippable builds][shippable] are run on a docker container which
 is build out of the Dockerfile given in this directory.
 
+
+## Other resources.
+
+There is a
+[`Dockerfile`][https://bitbucket.org/piyush-kurur/compilers/Dockerfile]
+in this repository which gives the latest ubuntu with all the
+necessary tools for this course. It is also use by our shippable
+builds. Images are available at dockerhub under the url
+<https://hub.docker.com/r/piyushkurur/compilers/>
+
+
+
 [status]: <https://api.shippable.com/projects/59800285202dac07006dad2e/badge?branch=master> "Build Status"
 [Course Repository]: <https://bitbucket.org/piyush-kurur/compilers>
 [Course Wiki]:       <https://bitbucket.org/piyush-kurur/compilers/wiki/Home>

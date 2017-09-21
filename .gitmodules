@@ -1,0 +1,3 @@
+[submodule "wiki"]
+	path = wiki
+	url = https://bitbucket.org/piyush-kurur/compilers.git/wiki

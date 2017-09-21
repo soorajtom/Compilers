@@ -1,6 +1,15 @@
+# This is the config file I use for CI with shippable.
 language: none
 build:
   pre_ci_boot:
+    # I use my own custom docker image which contains all the tools
+    # required for compiling code in this repository i.e. (smlnj,
+    # mlton and other standard ML tools).
+    #
+    # The docker file associated with this image is available at
+    #
+    # https://bitbucket.org/piyush-kurur/compilers/src/master/Dockerfile
+    #
     image_name: piyushkurur/compilers
     image_tag: latest
     pull: true
