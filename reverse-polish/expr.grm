@@ -21,6 +21,8 @@ it is empty *)
        | EXPS    of Ast.Expr list
        | PROGRAM of Ast.Expr list
 
+%left MUL
+%left PLUS MINUS
 (*
 
 Operator precedence and associativity. The %left says the operator is
@@ -30,6 +32,7 @@ left associative and the precedence increase as you go down this list.
 
 %left PLUS MINUS  (* + and - are of same precedence *)
 %left MUL         (* higher than + and -            *)
+>>>>>>> e8f8a742344a12e69c84b014667302ecfd929592
 
 (* The type that captures position in the input *)
 %pos int
