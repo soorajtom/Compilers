@@ -11,14 +11,23 @@ datatype lhs = nonTer of string;
 type production = lhs * rhs;
 (*type startSymbol = nonTerm;*)
 type Gram = (production list) * (string);
-val gra:Gram = ( [(nonTer("A"),[term("a"), nonTerm("B")]),
-                  (nonTer("A"),[epsilon]),
-                 (* (nonTer("A"),[nonTerm("B"), term("+")]),*)
-                  (nonTer("B"),[term("+"), nonTerm("B")]),
-                  (nonTer("B"),[term("-"), term("b")]) ] , "A" );
-
+(*val gra:Gram = ( [(nonTer("S"),[nonTerm("X"), nonTerm("Y"), nonTerm("Z")]),
+                  (nonTer("Y"),[term("c"), nonTerm("Y")]),
+                  (nonTer("Y"),[term("d"), nonTerm("Y")]),
+                  (nonTer("Y"),[epsilon]),
+                  (nonTer("X"),[term("a"), nonTerm("X"), term("b")]),
+                  (nonTer("X"),[epsilon]),
+                  (nonTer("Z"),[term("a")]) ] , "A" );*)
+val gra:Gram = ( [(nonTer("Z"),[term("d")]),
+                  (nonTer("Z"),[nonTerm("X"),nonTerm("Y"),nonTerm("Z")]),
+                  (nonTer("Y"),[epsilon]),
+                  (nonTer("Y"),[term("c")]),
+                  (nonTer("X"),[term("a")]),
+                  (nonTer("X"),[nonTerm("Y")])] , "A" );
 fun equal x y = if x = y then true else false;
 fun notequal x y = if x <> y then true else false;
+fun revlook( x :: y, a) = if(x = a)then 0 else (1 + revlook(y, a))
+   |revlook( [] , a) = ~1;
 
 fun getLhs(x : lhs * rhs):lhs = #1x;   (*Extracting lhs of production*)
 fun getRhs(x : lhs * rhs):rhs = #2x;   (*Extracting rhs of production*)
@@ -97,6 +106,7 @@ in
 	while (!tcount > 0) do(
 		nullable := strmap.insert((!nullable), List.nth (Terms, (!tcount - 1)), false);
 		FIRST := strmap.insert((!FIRST), List.nth (Terms, (!tcount - 1)), [List.nth (Terms, (!tcount - 1))]);
+		FOLLOW := strmap.insert((!FOLLOW), List.nth (Terms, (!tcount - 1)), []);
 		tcount := !tcount - 1
 	);
 	(!nullable, !FIRST, !FOLLOW)
@@ -104,8 +114,8 @@ end;
 
 val (nullable, FIRST, FOLLOW) = initmaps 0;
 
-fun isNull( x :: y) = strmap.lookup(nullable, x) andalso isNull(y)
-   |isNull( [] ) = true;
+fun isNull(tnullable, [] ) = true
+   |isNull(tnullable, x :: y ) = strmap.lookup(tnullable, x) andalso isNull(tnullable, y);
 (*fun isNullable( x :: y) = isNull(x) andalso isNullable(y)
    |isNullable( [] ) = true;*)
 			   
@@ -115,6 +125,7 @@ let
 	val pi = ref 0;
 	val k = ref 0;
 	val i = ref 0;
+	val j = ref 0;
 	val nu = ref (strmap.empty:bool strmap.map);
 	val FI = ref (strmap.empty:string list strmap.map);
 	val FO = ref (strmap.empty:string list strmap.map);
@@ -125,48 +136,140 @@ let
 	val prod = ref [""];
 	
 in
-	while((strmap.listItemsi(!nu) <> (strmap.listItemsi(!nullable)))andalso((strmap.listItemsi(!FI)) <> (strmap.listItemsi(!FIRST)))andalso((strmap.listItemsi(!FO)) <> (strmap.listItemsi(!FOLLOW))))do
+	while((strmap.listItemsi(!nu) <> (strmap.listItemsi(!nullable)))orelse((strmap.listItemsi(!FI)) <> (strmap.listItemsi(!FIRST)))orelse((strmap.listItemsi(!FO)) <> (strmap.listItemsi(!FOLLOW))))do
 	(
 		nu := !nullable;
 		FI := !FIRST;
 		FO := !FOLLOW;
-		ncount := (List.length NonTerms);
-		while (!ncount > 0) do                            (*for each nonTerm X*)
-		(
+		ncount := 1;
+		while (!ncount <= (List.length NonTerms)) do(                            (*for each nonTerm X*)
 			prodlist := expandNT(m, List.nth (NonTerms, (!ncount - 1)));
 			pi := 0;
-			while (!pi < (List.length (!prodlist))) do    (* for each production X -> Y1....Yk*)
-			(
+			while (!pi < (List.length (!prodlist))) do(    (* for each production X -> Y1....Yk*)
 				prod := List.nth (!prodlist, !pi);
-				nullable := strmap.insert(!nullable, (List.nth (NonTerms, (!ncount - 1))), strmap.lookup(!nullable, (List.nth (NonTerms, (!ncount - 1)))) orelse isNull(!prod));
+				nullable := (if(strmap.lookup(!nullable, (List.nth (NonTerms, (!ncount - 1)))))then(!nullable)else(strmap.insert(!nullable, (List.nth (NonTerms, (!ncount - 1))), isNull(!nullable,!prod))));
 				
 				k := List.length (!prod);
 				i := 1;
-				while(!i <= !k)do
-				(
-					
+				while(!i <= !k)do(
 					FIRST := strmap.insert(!FIRST, (List.nth (NonTerms, (!ncount - 1))) ,
-					if(isNull(List.take(!prod, !i - 1)))
-					then(strmap.lookup(!FIRST, (List.nth (NonTerms, (!ncount - 1)))) @ strmap.lookup(!FIRST, (List.nth (!prod, (!i - 1)))))
+					if(isNull(!nullable, List.take(!prod, !i - 1)))
+					then(strmap.lookup(!FIRST, (List.nth (NonTerms, (!ncount - 1)))) @ 
+					strmap.lookup(!FIRST, (List.nth (!prod, (!i - 1)))))
 					else(strmap.lookup(!FIRST, (List.nth (NonTerms, (!ncount - 1))))));
 					
-					FOLLOW := strmap.insert(!FOLLOW, (List.nth (NonTerms, (!ncount - 1))) ,
-					if(isNull(List.take(!prod, !i - 1)))
-					then(strmap.lookup(!FOLLOW, (List.nth (NonTerms, (!ncount - 1)))) @ strmap.lookup(!FOLLOW, (List.nth (!prod, (!i - 1)))))
-					else(strmap.lookup(!FOLLOW, (List.nth (NonTerms, (!ncount - 1))))));
-					i := !i + 1
-				);
-				
-				pi := !pi + 1	
-			);
-			ncount:= !ncount - 1
+					FIRST := strmap.insert(!FIRST, (List.nth (NonTerms, (!ncount - 1))) , 
+					copylist(strmap.lookup(!FIRST, (List.nth (NonTerms, (!ncount - 1)))), []));
+					
+					FOLLOW := (if(isNull(!nullable, List.drop(!prod, !i)))then(strmap.insert(!FOLLOW, (List.nth (!prod, (!i - 1))) , (strmap.lookup(!FOLLOW, (List.nth (NonTerms, (!ncount - 1)))) @ strmap.lookup(!FOLLOW, (List.nth (!prod, (!i - 1)))))))
+						else(!FOLLOW));
+					
+					FOLLOW := strmap.insert(!FOLLOW, (List.nth (!prod, (!i - 1))) ,
+					copylist( strmap.lookup(!FOLLOW, (List.nth (!prod, (!i - 1)))) ,[]));
+					
+					j := !i + 1;
+					while(!j <= !k)do(
+						FOLLOW := (if(isNull(!nullable, List.drop(List.take(!prod, !j - 1), !i)))then(strmap.insert(!FOLLOW, (List.nth (!prod, (!i - 1))) , (strmap.lookup(!FOLLOW, (List.nth (!prod, (!i - 1)))) @ strmap.lookup(!FIRST, (List.nth (!prod, (!j - 1)))))))
+						else(!FOLLOW));
+						
+						FOLLOW := strmap.insert(!FOLLOW, (List.nth (!prod, (!i - 1))) ,
+						copylist( strmap.lookup(!FOLLOW, (List.nth (!prod, (!i - 1)))) ,[]));
+						j := !j + 1
+					);
+					i := !i + 1);
+				pi := !pi + 1);
+			ncount:= !ncount + 1
 		)
 	);
 	(!nullable, !FIRST, !FOLLOW)
 end;
 
 val (nullable, FIRST, FOLLOW) = maketables s;
+strmap.listItemsi(nullable);
+strmap.listItemsi(FIRST);
+strmap.listItemsi(FOLLOW);
 
+(*predictive parsing table*)
+
+
+
+val pptable = Array2.array(List.length NonTerms, List.length Terms, []:string list list );
+
+fun appendToppt(x:int, k:string list, a :: b:string list) = 
+	[(Array2.update(pptable, x, revlook(Terms, a), copylist((Array2.sub(pptable, x, revlook(Terms, a))) @ [k], [])))] @ (appendToppt(x, k, b))
+   |appendToppt(x:int, k:string list, []:string list) = [];
+
+fun getFirsts(x :: gamma :string list) = if(strmap.lookup(nullable, x))then(strmap.lookup(FIRST, x) @ getFirsts(gamma))else(strmap.lookup(FIRST, x))
+   |getFirsts( [] ) = [];
+
+(*fun pptUpdateProd(x :: prod :) = ;*)
+
+fun makeppt _ =
+let
+	val nNT = ref (List.length NonTerms);
+	val nT = ref (List.length Terms);
+	val prods = ref [];
+	val gamma = ref [];
+	val firsts = ref [];
+	val follows = ref [];
+	val ret = ref [];
+	val nP = ref 0;
+	val i = ref 0;
+	val j = ref 0;
+in
+	while(!i < !nNT)do
+	(
+		prods := strmap.lookup(s, List.nth (NonTerms, !i));
+		nP := List.length (!prods);
+		j := 0;
+		while(!j < !nP)do
+		(
+			gamma := List.nth (!prods, !j);
+			firsts := getFirsts(!gamma);
+			follows := strmap.lookup(FOLLOW, (List.nth (NonTerms, !i)));
+			ret := (if(isNull(nullable, !gamma))then(!follows)else(!firsts));
+			appendToppt(!i, !gamma, !ret);	
+			
+			j := !j + 1
+		);
+		i := !i + 1
+	);
+	true
+end;
+
+val _ = makeppt 0;
+
+fun printppt(a :: x: string list) = [Array2.row(pptable, revlook(NonTerms, a))] @ printppt(x)
+   |printppt( [] ) = [];
+   
+printppt(NonTerms);
+(*
+val prods = ref []:string list list;
+val prod = ref []:string list;
+val gamma = ref []:string list;
+val firsts = ref []:string list;
+val follows = ref []:string list;
+val ret = ref []:string list;
+*)
+
+
+
+(*
+fun sepEachProds(x :: y:string list) = 
+	
+
+fun updatepptNT(x: string) = 
+ val temp = strmap.lookup(FIRST , x);
+ for each li in temp updatepptFi(ppt, x, hd li)
+;
+
+
+
+
+fun makeppt(ppt, s) = 
+	
+;
+*)
 
 (*fun getheads(m: maptype, x :: r :string list list) =
                            (if (List.exists (equal (hd x)) NonTerms)
