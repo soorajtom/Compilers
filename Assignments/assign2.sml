@@ -24,6 +24,11 @@ val gra:Gram = ( [(nonTer("Z"),[term("d")]),
                   (nonTer("Y"),[term("c")]),
                   (nonTer("X"),[term("a")]),
                   (nonTer("X"),[nonTerm("Y")])] , "A" );
+(*val gra:Gram = ( [(nonTer("A"),[term("a"), nonTerm("A")]),
+                  (nonTer("A"),[nonTerm("B")]),
+                  (nonTer("C"),[epsilon]),
+                  (nonTer("B"),[term("c")]),
+                  (nonTer("B"),[nonTerm("C"), term("c")])] , "A" );*)
 fun equal x y = if x = y then true else false;
 fun notequal x y = if x <> y then true else false;
 fun revlook( x :: y, a) = if(x = a)then 0 else (1 + revlook(y, a))
@@ -116,8 +121,11 @@ val (nullable, FIRST, FOLLOW) = initmaps 0;
 
 fun isNull(tnullable, [] ) = true
    |isNull(tnullable, x :: y ) = strmap.lookup(tnullable, x) andalso isNull(tnullable, y);
-(*fun isNullable( x :: y) = isNull(x) andalso isNullable(y)
-   |isNullable( [] ) = true;*)
+
+fun updateNullable(cnullable, ncount, prod) = 
+            (if(strmap.lookup(cnullable, (List.nth (NonTerms, (ncount - 1)))))
+            then(cnullable)
+            else(strmap.insert(cnullable, (List.nth (NonTerms, (ncount - 1))), isNull(cnullable,prod))));
 			   
 fun maketables m =
 let
@@ -136,8 +144,9 @@ let
 	val prod = ref [""];
 	
 in
-	while((strmap.listItemsi(!nu) <> (strmap.listItemsi(!nullable)))orelse((strmap.listItemsi(!FI)) <> (strmap.listItemsi(!FIRST)))orelse((strmap.listItemsi(!FO)) <> (strmap.listItemsi(!FOLLOW))))do
-	(
+	while((strmap.listItemsi(!nu) <> (strmap.listItemsi(!nullable)))
+		  orelse((strmap.listItemsi(!FI)) <> (strmap.listItemsi(!FIRST)))
+		  orelse((strmap.listItemsi(!FO)) <> (strmap.listItemsi(!FOLLOW))))do(
 		nu := !nullable;
 		FI := !FIRST;
 		FO := !FOLLOW;
@@ -147,7 +156,7 @@ in
 			pi := 0;
 			while (!pi < (List.length (!prodlist))) do(    (* for each production X -> Y1....Yk*)
 				prod := List.nth (!prodlist, !pi);
-				nullable := (if(strmap.lookup(!nullable, (List.nth (NonTerms, (!ncount - 1)))))then(!nullable)else(strmap.insert(!nullable, (List.nth (NonTerms, (!ncount - 1))), isNull(!nullable,!prod))));
+				nullable := updateNullable(!nullable, !ncount, !prod);
 				
 				k := List.length (!prod);
 				i := 1;
@@ -190,8 +199,6 @@ strmap.listItemsi(FIRST);
 strmap.listItemsi(FOLLOW);
 
 (*predictive parsing table*)
-
-
 
 val pptable = Array2.array(List.length NonTerms, List.length Terms, []:string list list );
 
@@ -243,6 +250,8 @@ fun printppt(a :: x: string list) = [Array2.row(pptable, revlook(NonTerms, a))] 
    |printppt( [] ) = [];
    
 printppt(NonTerms);
+
+
 (*
 val prods = ref []:string list list;
 val prod = ref []:string list;
