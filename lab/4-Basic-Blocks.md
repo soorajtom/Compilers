@@ -1,4 +1,4 @@
-# Basic blocks.
+# Basic blocks (Deadline October 6, 2017).
 
 1. Formulate an ML data type to capture directed graphs required to
    implement dataflow analysis for the graph. You can start with trying to
