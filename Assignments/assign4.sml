@@ -17,11 +17,12 @@ signature GraphType = sig
 	eqtype nType;
 end;
 
+fun equal a b = (a = b);
+
 functor dirgraph( gType:GraphType ):Graph = 
 struct
     
     type node = gType.nType;
-    fun equal a b = (a = b);
     type graph = (node * (node list)) list;
         
     val empty = [];
@@ -53,13 +54,22 @@ structure intG = dirgraph(intGtype);
 val sampleg : intG.graph = [(1,[2]),(2,[3]),(3,[4]),(4,[5, 6]),(5,[7]),(6,[]),(7,[])];
 val graph1 : intG.graph = [(1,[2]),(2,[3]),(3,[4]),(4,[5, 2]),(5,[6, 7]),(6,[8]),(7,[9]),(8,[]),(9,[10,11]),(10,[]),(11,[])];
 val graph2 : intG.graph = [ (1, [2]), (2, [3,4]), (3,[5]), (4, [6]), (5, [1]), (6, []) ];
+val axel : intG.graph = [ (1,[2]),(2,[3]),(3,[4,1]),(4,[5,1]),(5,[])];
+val axel2 : intG.graph = [(1, [2,6]),(2, [3]),(3, [4]),(4, []), (5, [4]), (6, [5])];
 
-fun extractLeadsSucc ((x, y) :: xs) g = if (List.length y) > 1 then y @ extractLeadsSucc xs g
-								else(extractLeadsSucc xs g)
-   |extractLeadsSucc _ _= [];
+fun refineList(x :: a) = if List.exists (equal x) a then refineList(a) else [x] @ refineList(a)
+   |refineList(x)  = x;
+
+fun extractLeadsSucc ((x, y) :: xs) = if (List.length y) > 1 then y @ extractLeadsSucc xs
+								else(extractLeadsSucc xs)
+   |extractLeadsSucc _ = [];
+   
+fun extractLeadsPred ((x,y) :: xs) g = if (List.length (intG.pred x g)) > 1 then x :: (extractLeadsPred xs g)
+								else(extractLeadsPred xs g)
+   |extractLeadsPred _ _= [];
 
 fun searchNode n ((x, y) :: xs) = if x = n then 0 else 1 + searchNode n xs
-   |searchNode _ _ = 999;
+   |searchNode _ _ = ~999;
    (*
 fun getBlock (a:int) (g:((int * (int list)) list)) = 
 					if (List.length ((List.nth g (searchNode a g))#2)) > 1 then [] 					
@@ -70,10 +80,10 @@ fun getBlock (a:int) (g:((int * (int list)) list)) =
 fun isaleader [x] (l :: leads) = if( x = l) then true else isaleader [x] leads
    |isaleader _ _ = false;
 
-fun getBlock [a] (g:((int * (int list)) list)) lNodes= 
+fun getBlock [a] g lNodes= 
 					let
 					val index = searchNode a g;
-					val nextnode:(int list) = intG.succ a g;
+					val nextnode = intG.succ a g;
 					(*val fnode = List.nth nextnode 0;*)
 					in
 					if(((List.length nextnode ) > 1) orelse (isaleader nextnode lNodes)) then [a]
@@ -84,8 +94,8 @@ fun getBlock [a] (g:((int * (int list)) list)) lNodes=
 fun getBasicBlocks (x :: leads) lNodes graph = [getBlock [x] graph lNodes] @ getBasicBlocks leads lNodes graph
    |getBasicBlocks _ _ _ = [];
    
-fun main start graph = let
-					val leaderNodes = (start :: (extractLeadsSucc graph graph));
+fun bbs start graph = let
+					val leaderNodes = refineList ([start] @ (extractLeadsSucc graph) @ (extractLeadsPred graph graph));
 					in
 					getBasicBlocks leaderNodes leaderNodes graph
 					end;
