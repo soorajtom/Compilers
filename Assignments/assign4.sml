@@ -51,11 +51,12 @@ end;
 
 structure intG = dirgraph(intGtype);
 
-val sampleg : intG.graph = [(1,[2]),(2,[3]),(3,[4]),(4,[5, 6]),(5,[7]),(6,[]),(7,[])];
-val graph1 : intG.graph = [(1,[2]),(2,[3]),(3,[4]),(4,[5, 2]),(5,[6, 7]),(6,[8]),(7,[9]),(8,[]),(9,[10,11]),(10,[]),(11,[])];
+val graph0 : intG.graph = [(1,[2]),(2,[3]),(3,[4]),(4,[5, 6]),(5,[7]),(6,[]),(7,[])];
+val graph1 : intG.graph = [(3,[4]),(7,[9]),(9,[10,11]),(1,[2]),(2,[3]),(4,[5, 2]),(5,[6, 7]),(6,[8]),(8,[]),(10,[]),(11,[])];
 val graph2 : intG.graph = [ (1, [2]), (2, [3,4]), (3,[5]), (4, [6]), (5, [1]), (6, []) ];
-val axel : intG.graph = [ (1,[2]),(2,[3]),(3,[4,1]),(4,[5,1]),(5,[])];
-val axel2 : intG.graph = [(1, [2,6]),(2, [3]),(3, [4]),(4, []), (5, [4]), (6, [5])];
+val graph3 : intG.graph = [ (1,[2]),(2,[3]),(3,[4,1]),(4,[5,1]),(5,[])];
+val graph4 : intG.graph = [(1, [2,6]),(2, [3]),(3, [4]),(4, []), (5, [4]), (6, [5])];
+val graph5 : intG.graph = [(1,[2]),(2,[3]),(3,[1]),(4,[3,1])];
 
 fun refineList(x :: a) = if List.exists (equal x) a then refineList(a) else [x] @ refineList(a)
    |refineList(x)  = x;
@@ -64,7 +65,7 @@ fun extractLeadsSucc ((x, y) :: xs) = if (List.length y) > 1 then y @ extractLea
 								else(extractLeadsSucc xs)
    |extractLeadsSucc _ = [];
    
-fun extractLeadsPred ((x,y) :: xs) g = if (List.length (intG.pred x g)) > 1 then x :: (extractLeadsPred xs g)
+fun extractLeadsPred ((x,y) :: xs) g = if (List.length (intG.pred x g)) <> 1 then x :: (extractLeadsPred xs g)
 								else(extractLeadsPred xs g)
    |extractLeadsPred _ _= [];
 
@@ -94,12 +95,32 @@ fun getBlock [a] g lNodes=
 fun getBasicBlocks (x :: leads) lNodes graph = [getBlock [x] graph lNodes] @ getBasicBlocks leads lNodes graph
    |getBasicBlocks _ _ _ = [];
    
-fun bbs start graph = let
+fun basicBlocks start graph = let
 					val leaderNodes = refineList ([start] @ (extractLeadsSucc graph) @ (extractLeadsPred graph graph));
 					in
 					getBasicBlocks leaderNodes leaderNodes graph
 					end;
 
+fun getstart (x :: xs) (s :: ss)  g= if ((List.length (intG.pred x g)) = 0) then (x) 
+                                else ( if (x = s) then (x) else getstart (intG.pred x g) (s :: ss) g )
+   |getstart (x :: xs) []  g = x;
+
+fun basicBlockList ((x, y) :: xs) = 
+                let
+                val preds = intG.pred x ((x, y) :: xs);
+                val start = getstart (intG.nodes ((x, y) :: xs)) preds ((x, y) :: xs);
+                in
+                basicBlocks start ((x, y) :: xs)
+                end;
+(*
+structure bblockType:GraphType = 
+struct
+    type nType = int list;
+end;
+
+structure bBlockGraph = dirgraph (bblockType);
+
+*)
 
 
 
