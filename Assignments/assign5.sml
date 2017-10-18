@@ -80,7 +80,7 @@ struct
     fun defSet x = AtomSet.fromList (List.map Atom.atom (List.nth ([["a"],["b"],["c"],["a"],[],[]], x - 1)));
 end;
 
-val sampleg:insGraph.graph = [(1,[2]), (2,[3]), (3,[4]), (4,[5]), (5,[6, 2])];
+val sampleg:insGraph.graph = [(1,[2]), (2,[3]), (3,[4]), (4,[5]), (5,[6, 2]), (6,[])];
 
 fun getInx x outmap =
         let
@@ -111,45 +111,44 @@ fun getOutInst (x :: xs) inmap outmap dfgraph=
                 ((ASetMap.insert (outmap, x, (getOutx x inmap dfgraph))), (getOutInst xs inmap outmap dfgraph))
    |getOutInst _ _ _ _= ASetMap.empty;
 
-(*fun getSetMapList setMap = List.map (AtomSet.listItems) (ASetMap.listItems setMap)*)
-fun getSetMapList setMap = 0;
-fun equateinout tup1 tup2= true;
-
-(*fun updateInOut (dfgraph, inmap, outmap) =
-        let
-            val insNodes = insGraph.nodes dfgraph;
-            val p_outmap = getOutInst insNodes inmap outmap dfgraph;
-            val p_inmap = getInInst insNodes inmap outmap;
-        in
-            (inmap, outmap)
-        end;*)
-
-(*fun getInOut dfgraph =
+fun equatemaps map1 map2 =
     let
-        val insNodes = insGraph.nodes dfgraph;
-        val inmap = ref (makeASetMap insNodes);
-        val outmap = ref (makeASetMap insNodes);
+        val Atomsetlist = ASetMap.listItems map1;
+        val Atomlist = List.concat (List.map AtomSet.listItems Atomsetlist);
+        val Mapstr1 = List.map (Atom.toString) Atomlist;
+        val Atomsetlist = ASetMap.listItems map2;
+        val Atomlist = List.concat (List.map AtomSet.listItems Atomsetlist);
+        val Mapstr2 = List.map (Atom.toString) Atomlist;
     in
-        while(equateinout (!inmap, !outmap) (updateInOut dfgraph (!inmap) (!outmap)))do(
-            inmap := getInInst insNodes !inmap !outmap;
-            outmap := getOutInst insNodes !inmap !outmap dfgraph
-        );
-        (inmap, outmap)
-    end;*)
+        Mapstr2 = Mapstr1
+    end;
+
 fun getInOut dfgraph inmap outmap =
         let
             val insNodes = insGraph.nodes dfgraph;
             val p_inmap = getInInst insNodes inmap outmap;
             val p_outmap = getOutInst insNodes inmap outmap dfgraph;
         in
-            if(equateinout (inmap, outmap) (p_inmap, p_outmap))then
+            if((equatemaps inmap p_inmap) andalso (equatemaps outmap p_outmap))then
             (inmap, outmap)
             else
             (getInOut dfgraph p_inmap p_outmap)
         end;
 
+fun display x =
+        List.map (List.map (Atom.toString)) (List.map (AtomSet.listItems) (ASetMap.listItems x));
+
 fun main dfgraph =
-    getInOut dfgraph (makeASetMap (insGraph.nodes dfgraph)) (makeASetMap (insGraph.nodes dfgraph));
+    let
+        val (inmap, outmap) = getInOut dfgraph (makeASetMap (insGraph.nodes dfgraph)) (makeASetMap (insGraph.nodes dfgraph));
+    in
+        (*(List.map (AtomSet.listItems) (ASetMap.listItems inmap), List.map (AtomSet.listItems) (ASetMap.listItems outmap))*)
+        (inmap, outmap, display inmap, display outmap)
+    end;
+
+val result = main sampleg;
+
+
 
 (*fun getInOut insNodes dfgraph p_inmap p_outmap p_inmap p_outmap=
         (p_inmap, p_outmap)
