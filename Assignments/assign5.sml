@@ -51,16 +51,32 @@ sig
     val defSet : inst -> AtomSet.set (* Get the def set of an instruction *)
 end
 
-structure insNode:Instruction =
+structure Inst:Instruction =
 struct
-    type inst = string list;
-    fun useSet inst = AtomSet.empty;
-    fun defSet inst = AtomSet.empty;
-end
+    type inst = string;
+    fun useSet _ = AtomSet.empty;
+    fun defSet _ = AtomSet.empty;
+end;
 
-structure dataflownode:GraphType =
-struct
-    type nType = insNode.inst;
-end
+fun getInx x outmap =
+        let
+            val usex = (Inst.useSet x);
+            val outx = AtomMap.lookup outmap x;
+            val defx = (Inst.defSet x);
+        in
+            AtomSet.union (usex, (AtomSet.difference (outx, defx)))
+        end
 
-structure dataflow:Graph = dirgraph(dataflownode);
+fun getInIns (x :: insNodes) inmap outmap = AtomMap.unionWith (AtomSet.union) ( AtomMap.insert inmap x (getInx x outmap) ) (getInIns insNodes inmap outmap)
+   |getInIns [] _ _ = AtomMap.empty;
+
+fun getInOut insNodes inmap outmap =
+        let
+            val p_inmap = getInIns insNodes inmap outmap;
+            val p_outmap = getOutIns insNodes inmap outmap;
+        in
+            if((p_inmap = inmap) andalso (p_outmap = outmap))then
+            (inmap, outmap)
+            else
+            getInOut insNodes p_inmap p_outmap
+        end
