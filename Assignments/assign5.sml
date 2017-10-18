@@ -51,16 +51,26 @@ sig
     val defSet : inst -> AtomSet.set (* Get the def set of an instruction *)
 end
 
+type insType = string;
+
 structure insGraphtype:GraphType =
 struct
-    type nType = string;
+    type nType = insType;
 end
 
 structure insGraph = dirgraph(insGraphtype);
 
+structure SetMapKey:ORD_KEY =
+struct
+    type ord_key = insType;
+    val compare = String.compare;
+end
+
+structure ASetMap = ListMapFn(SetMapKey);
+
 structure Inst:Instruction =
 struct
-    type inst = string;
+    type inst = insType;
     fun useSet _ = AtomSet.empty;
     fun defSet _ = AtomSet.empty;
 end;
@@ -68,13 +78,13 @@ end;
 fun getInx x outmap =
         let
             val usex = (Inst.useSet x);
-            val outx = AtomMap.lookup outmap x;
+            val outx = ASetMap.lookup outmap x;
             val defx = (Inst.defSet x);
         in
             AtomSet.union (usex, (AtomSet.difference (outx, defx)))
         end
 
-fun getListIns (x :: succlist) inmap = AtomSet.listItems (AtomMap.lookup inmap x) @ getListIns succlist inmap
+fun getListIns (x :: succlist) inmap = AtomSet.listItems (ASetMap.lookup inmap x) @ getListIns succlist inmap
    |getListIns _ _ = [];
 
 fun getOutx x inmap dfgraph =
@@ -84,16 +94,28 @@ fun getOutx x inmap dfgraph =
             AtomSet.fromList (getListIns succlist inmap)
         end
 
-fun getInOutIns dfgraph (x :: insNodes) inmap outmap = AtomMap.unionWith (AtomSet.union) ( (AtomMap.insert (inmap, (Atom.atom x), (getInx x outmap)) ), (getInIns insNodes inmap outmap))
-   |getInIns _ _ _ _ = (AtomMap.empty, AtomMap.empty);
+fun getInInst (x :: insNodes) inmap outmap =
+                (ASetMap.unionWith (AtomSet.union)
+                ((ASetMap.insert (inmap, x, (getInx x outmap))), (getInInst insNodes inmap outmap)))
+   |getInInst _ _ _ = ASetMap.empty;
 
-fun getInOut dfgraph insNodes inmap outmap =
+(*fun getOutInst ((x :: insNodes), outmap, inmap, dfgraph)=
+                ASetMap.unionWith (AtomSet.union)
+                ((ASetMap.insert (outmap, x, (getOutx x inmap dfgraph))), (getOutInst (insNodes, outmap, inmap, dfgraph)))*)
+fun getOutInst _ = ASetMap.empty;
+
+(*fun getSetMapList setMap = List.map (AtomSet.listItems) (ASetMap.listItems setMap)*)
+fun getSetMapList setMap = [];
+
+fun getInOut insNodes dfgraph inmap outmap =
         let
-            val p_inoutmaps = getInOutIns dfgraph insNodes inmap outmap;
-            (*val p_outmap = getOutIns insNodes inmap outmap;*)
+            (*val insNodes = insGraph.nodes dfgraph;*)
+            val p_inmap = getInInst insNodes inmap outmap;
+            val p_outmap = getOutInst (insNodes, outmap, inmap, dfgraph);
         in
-            if((p_inmap = inmap) andalso (p_outmap = outmap))then
+            if(((getSetMapList p_inmap) = (getSetMapList inmap)) andalso
+            ((getSetMapList p_outmap) = (getSetMapList outmap)))then
             (inmap, outmap)
             else
-            getInOut insNodes p_inmap p_outmap
+            (getInOut insNodes dfgraph p_inmap p_outmap)
         end

@@ -94,7 +94,7 @@ val s = makeMapofProdrules(s, #1gra);
 fun expandNT(m:maptype, x:string) = strmap.lookup(m, x);
 
 (*initialising nullable, first and follow maps*)
-fun initmaps _ = 
+fun initmaps _ =
 let
 	val ncount = ref (List.length NonTerms);
 	val tcount = ref (List.length Terms);
@@ -122,11 +122,11 @@ val (nullable, FIRST, FOLLOW) = initmaps 0;
 fun isNull(tnullable, [] ) = true
    |isNull(tnullable, x :: y ) = strmap.lookup(tnullable, x) andalso isNull(tnullable, y);
 
-fun updateNullable(cnullable, ncount, prod) = 
+fun updateNullable(cnullable, ncount, prod) =
             (if(strmap.lookup(cnullable, (List.nth (NonTerms, (ncount - 1)))))
             then(cnullable)
             else(strmap.insert(cnullable, (List.nth (NonTerms, (ncount - 1))), isNull(cnullable,prod))));
-			   
+
 fun maketables m =
 let
 	val ncount = ref (List.length NonTerms);
@@ -142,7 +142,7 @@ let
 	val FOLLOW = ref FOLLOW;
 	val prodlist = ref [[""]];
 	val prod = ref [""];
-	
+
 in
 	while((strmap.listItemsi(!nu) <> (strmap.listItemsi(!nullable)))
 		  orelse((strmap.listItemsi(!FI)) <> (strmap.listItemsi(!FIRST)))
@@ -157,30 +157,30 @@ in
 			while (!pi < (List.length (!prodlist))) do(    (* for each production X -> Y1....Yk*)
 				prod := List.nth (!prodlist, !pi);
 				nullable := updateNullable(!nullable, !ncount, !prod);
-				
+
 				k := List.length (!prod);
 				i := 1;
 				while(!i <= !k)do(
 					FIRST := strmap.insert(!FIRST, (List.nth (NonTerms, (!ncount - 1))) ,
 					if(isNull(!nullable, List.take(!prod, !i - 1)))
-					then(strmap.lookup(!FIRST, (List.nth (NonTerms, (!ncount - 1)))) @ 
+					then(strmap.lookup(!FIRST, (List.nth (NonTerms, (!ncount - 1)))) @
 					strmap.lookup(!FIRST, (List.nth (!prod, (!i - 1)))))
 					else(strmap.lookup(!FIRST, (List.nth (NonTerms, (!ncount - 1))))));
-					
-					FIRST := strmap.insert(!FIRST, (List.nth (NonTerms, (!ncount - 1))) , 
+
+					FIRST := strmap.insert(!FIRST, (List.nth (NonTerms, (!ncount - 1))) ,
 					copylist(strmap.lookup(!FIRST, (List.nth (NonTerms, (!ncount - 1)))), []));
-					
+
 					FOLLOW := (if(isNull(!nullable, List.drop(!prod, !i)))then(strmap.insert(!FOLLOW, (List.nth (!prod, (!i - 1))) , (strmap.lookup(!FOLLOW, (List.nth (NonTerms, (!ncount - 1)))) @ strmap.lookup(!FOLLOW, (List.nth (!prod, (!i - 1)))))))
 						else(!FOLLOW));
-					
+
 					FOLLOW := strmap.insert(!FOLLOW, (List.nth (!prod, (!i - 1))) ,
 					copylist( strmap.lookup(!FOLLOW, (List.nth (!prod, (!i - 1)))) ,[]));
-					
+
 					j := !i + 1;
 					while(!j <= !k)do(
 						FOLLOW := (if(isNull(!nullable, List.drop(List.take(!prod, !j - 1), !i)))then(strmap.insert(!FOLLOW, (List.nth (!prod, (!i - 1))) , (strmap.lookup(!FOLLOW, (List.nth (!prod, (!i - 1)))) @ strmap.lookup(!FIRST, (List.nth (!prod, (!j - 1)))))))
 						else(!FOLLOW));
-						
+
 						FOLLOW := strmap.insert(!FOLLOW, (List.nth (!prod, (!i - 1))) ,
 						copylist( strmap.lookup(!FOLLOW, (List.nth (!prod, (!i - 1)))) ,[]));
 						j := !j + 1
@@ -202,7 +202,7 @@ strmap.listItemsi(FOLLOW);
 
 val pptable = Array2.array(List.length NonTerms, List.length Terms, []:string list list );
 
-fun appendToppt(x:int, k:string list, a :: b:string list) = 
+fun appendToppt(x:int, k:string list, a :: b:string list) =
 	[(Array2.update(pptable, x, revlook(Terms, a), copylist((Array2.sub(pptable, x, revlook(Terms, a))) @ [k], [])))] @ (appendToppt(x, k, b))
    |appendToppt(x:int, k:string list, []:string list) = [];
 
@@ -235,8 +235,8 @@ in
 			firsts := getFirsts(!gamma);
 			follows := strmap.lookup(FOLLOW, (List.nth (NonTerms, !i)));
 			ret := (if(isNull(nullable, !gamma))then(!follows)else(!firsts));
-			appendToppt(!i, !gamma, !ret);	
-			
+			appendToppt(!i, !gamma, !ret);
+
 			j := !j + 1
 		);
 		i := !i + 1
@@ -248,7 +248,7 @@ val _ = makeppt 0;
 
 fun printppt(a :: x: string list) = [Array2.row(pptable, revlook(NonTerms, a))] @ printppt(x)
    |printppt( [] ) = [];
-   
+
 printppt(NonTerms);
 
 
@@ -264,10 +264,10 @@ val ret = ref []:string list;
 
 
 (*
-fun sepEachProds(x :: y:string list) = 
-	
+fun sepEachProds(x :: y:string list) =
 
-fun updatepptNT(x: string) = 
+
+fun updatepptNT(x: string) =
  val temp = strmap.lookup(FIRST , x);
  for each li in temp updatepptFi(ppt, x, hd li)
 ;
@@ -275,8 +275,8 @@ fun updatepptNT(x: string) =
 
 
 
-fun makeppt(ppt, s) = 
-	
+fun makeppt(ppt, s) =
+
 ;
 *)
 
