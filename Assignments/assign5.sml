@@ -46,7 +46,21 @@ end;
 
 signature Instruction =
 sig
-    type inst
+    eqtype inst
     val useSet : inst -> AtomSet.set (* Get the use set of an instruction *)
     val defSet : inst -> AtomSet.set (* Get the def set of an instruction *)
 end
+
+structure insNode:Instruction =
+struct
+    type inst = string list;
+    fun useSet inst = AtomSet.empty;
+    fun defSet inst = AtomSet.empty;
+end
+
+structure dataflownode:GraphType =
+struct
+    type nType = insNode.inst;
+end
+
+structure dataflow:Graph = dirgraph(dataflownode);
