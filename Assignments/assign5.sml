@@ -51,6 +51,13 @@ sig
     val defSet : inst -> AtomSet.set (* Get the def set of an instruction *)
 end
 
+structure insGraphtype:GraphType =
+struct
+    type nType = string;
+end
+
+structure insGraph = dirgraph(insGraphtype);
+
 structure Inst:Instruction =
 struct
     type inst = string;
@@ -67,13 +74,23 @@ fun getInx x outmap =
             AtomSet.union (usex, (AtomSet.difference (outx, defx)))
         end
 
-fun getInIns (x :: insNodes) inmap outmap = AtomMap.unionWith (AtomSet.union) ( AtomMap.insert inmap x (getInx x outmap) ) (getInIns insNodes inmap outmap)
-   |getInIns [] _ _ = AtomMap.empty;
+fun getListIns (x :: succlist) inmap = AtomSet.listItems (AtomMap.lookup inmap x) @ getListIns succlist inmap
+   |getListIns _ _ = [];
 
-fun getInOut insNodes inmap outmap =
+fun getOutx x inmap dfgraph =
         let
-            val p_inmap = getInIns insNodes inmap outmap;
-            val p_outmap = getOutIns insNodes inmap outmap;
+            val succlist = insGraph.succ x dfgraph;
+        in
+            AtomSet.fromList (getListIns succlist inmap)
+        end
+
+fun getInOutIns dfgraph (x :: insNodes) inmap outmap = AtomMap.unionWith (AtomSet.union) ( (AtomMap.insert (inmap, (Atom.atom x), (getInx x outmap)) ), (getInIns insNodes inmap outmap))
+   |getInIns _ _ _ _ = (AtomMap.empty, AtomMap.empty);
+
+fun getInOut dfgraph insNodes inmap outmap =
+        let
+            val p_inoutmaps = getInOutIns dfgraph insNodes inmap outmap;
+            (*val p_outmap = getOutIns insNodes inmap outmap;*)
         in
             if((p_inmap = inmap) andalso (p_outmap = outmap))then
             (inmap, outmap)
