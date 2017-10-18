@@ -138,7 +138,7 @@ fun getInOut dfgraph inmap outmap =
 fun display x =
         List.map (List.map (Atom.toString)) (List.map (AtomSet.listItems) (ASetMap.listItems x));
 
-fun main dfgraph =
+fun question1 dfgraph =
     let
         val (inmap, outmap) = getInOut dfgraph (makeASetMap (insGraph.nodes dfgraph)) (makeASetMap (insGraph.nodes dfgraph));
     in
@@ -146,16 +146,25 @@ fun main dfgraph =
         (inmap, outmap, display inmap, display outmap)
     end;
 
-val result = main sampleg;
+val answer1 = question1 sampleg;
 
+fun findGenKillbb (x :: blist)=
+    let
+        val g1 = Inst.useSet x;
+        val k1 = Inst.defSet x;
+        val (g2, k2) = findGenKillbb blist;
+        val newgen = AtomSet.union (g1, (AtomSet.difference (g2, k1)));
+        val newkill = AtomSet.union (k1, k2);
+    in
+        (newgen, newkill)
+    end
+   |findGenKillbb [] = (AtomSet.empty, AtomSet.empty);
 
+(*fun getGenKillbb (x :: bblock) = findGenKillbb (bblock) (Inst.defSet x) (Inst.useSet x)
+   |getGenKillbb _ = (AtomSet.empty, AtomSet.empty);
 
-(*fun getInOut insNodes dfgraph p_inmap p_outmap p_inmap p_outmap=
-        (p_inmap, p_outmap)
-   |getInOut insNode dfgraph inmap outmap p_inmap p_outmap=
-        let
-            val n_inmap = getInInst insNodes inmap outmap;
-            val n_outmap = getOutInst (insNodes, outmap, inmap, dfgraph);
-        in
-            getInOut insNode dfgraph n_inmap n_outmap inmap outmap
-        end;*)
+fun GenKillbb bblock = getGenKillbb (List.rev bblock);*)
+
+val res = findGenKillbb [2,3,4,5];
+List.map (Atom.toString) (AtomSet.listItems (#1res));
+List.map (Atom.toString) (AtomSet.listItems (#2res));
