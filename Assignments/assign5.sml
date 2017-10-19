@@ -26,22 +26,37 @@ structure insGraph = dirgraph(insGraphtype);
 structure BBGraph = dirgraph(BBGraphType);
 val sampleg:insGraph.graph = [(1,[2]), (2,[3]), (3,[4]), (4,[5]), (5,[6, 2]), (6,[])];
 
-fun connectcomp (x :: xs) bblist bbgraph=
+fun isleaderof a b = a = (hd b);
+
+fun linksucc par y bblist bbgraph =
     let
-        val succlist = insGraph.succ (List.last x);
+        val ylead = hd (List.filter (isleaderof y) bblist);
     in
-        0
+        BBGraph.addEdge (par, ylead) bbgraph
     end;
-fun addtograph (x :: xs) graph =
-    BBGraph.newNode x (addtograph xs graph)
-   |addtograph [] graph = BBGraph.empty;
+
+fun linksucclist par (y :: ys) bblist bbgraph =
+    linksucclist par ys bblist (linksucc par y bblist bbgraph)
+   |linksucclist _ _ _ bbgraph = bbgraph;
+
+fun connectcomp (x :: xs) bblist bbgraph dfgraph=
+    let
+        val succlist = insGraph.succ (List.last x) dfgraph;
+    in
+        connectcomp xs bblist (linksucclist x succlist bblist bbgraph) dfgraph
+    end
+   |connectcomp _ _ bbgraph _ = bbgraph;
+
+fun addtographlist (x :: xs) graph =
+    BBGraph.newNode x (addtographlist xs graph)
+   |addtographlist [] graph = BBGraph.empty;
 
 fun makebbgraph start dfgraph =
     let
         val bblist = basicBlocks start dfgraph;
-        val bbg = addtograph bblist;
+        val bbg = addtographlist bblist BBGraph.empty;
     in
-        connectcomp bblist bblist (bbg)
+        connectcomp bblist bblist bbg dfgraph
     end;
 
 structure SetMapKey:ORD_KEY =
