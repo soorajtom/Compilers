@@ -32,7 +32,9 @@ fun linksucc par y bblist bbgraph =
     let
         val ylead = hd (List.filter (isleaderof y) bblist);
     in
-        BBGraph.addEdge (par, ylead) bbgraph
+        if(ylead = par)then
+        (bbgraph)
+        else (BBGraph.addEdge (par, ylead) bbgraph)
     end;
 
 fun linksucclist par (y :: ys) bblist bbgraph =
@@ -58,6 +60,8 @@ fun makebbgraph start dfgraph =
     in
         connectcomp bblist bblist bbg dfgraph
     end;
+
+val samplegbbg = makebbgraph 1 sampleg;
 
 structure SetMapKey:ORD_KEY =
 struct
@@ -156,13 +160,6 @@ fun question1 dfgraph =
     end;
 
 val answer1 = question1 sampleg;
-
-
-
-(*fun getGenKillbb (x :: bblock) = findGenKillbb (bblock) (Inst.defSet x) (Inst.useSet x)
-   |getGenKillbb _ = (AtomSet.empty, AtomSet.empty);
-
-fun GenKillbb bblock = getGenKillbb (List.rev bblock);*)
 
 val res = findGenKillbb [2,3,4,5];
 List.map (Atom.toString) (AtomSet.listItems (#1res));
