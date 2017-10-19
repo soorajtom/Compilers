@@ -24,7 +24,9 @@ end
 
 structure insGraph = dirgraph(insGraphtype);
 structure BBGraph = dirgraph(BBGraphType);
+structure usedefmap = dirgraph(BBGraphType);
 val sampleg:insGraph.graph = [(1,[2]), (2,[3]), (3,[4]), (4,[5]), (5,[6, 2]), (6,[])];
+
 val sampleuse = [[],["a"],["b", "c"],["b"],["a"],["c"]];
 val sampledef = [["a"],["b"],["c"],["a"],[],[]];
 
@@ -77,6 +79,8 @@ type ASetMapType = AtomRedBlackSet.set ASetMap.map;
 
 fun makeASetMap (x :: xs) = ASetMap.insert ((makeASetMap xs), x, AtomSet.empty)
    |makeASetMap [] = ASetMap.empty;
+
+(*fun getfrom ind*)
 
 structure Inst:Instruction =
 struct
