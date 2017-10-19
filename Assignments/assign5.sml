@@ -25,6 +25,8 @@ end
 structure insGraph = dirgraph(insGraphtype);
 structure BBGraph = dirgraph(BBGraphType);
 val sampleg:insGraph.graph = [(1,[2]), (2,[3]), (3,[4]), (4,[5]), (5,[6, 2]), (6,[])];
+val sampleuse = [[],["a"],["b", "c"],["b"],["a"],["c"]];
+val sampledef = [["a"],["b"],["c"],["a"],[],[]];
 
 fun isleaderof a b = a = (hd b);
 
@@ -79,8 +81,8 @@ fun makeASetMap (x :: xs) = ASetMap.insert ((makeASetMap xs), x, AtomSet.empty)
 structure Inst:Instruction =
 struct
     type inst = insType;
-    fun useSet x = AtomSet.fromList (List.map Atom.atom (List.nth ([[],["a"],["b", "c"],["b"],["a"],["c"]], x - 1)));
-    fun defSet x = AtomSet.fromList (List.map Atom.atom (List.nth ([["a"],["b"],["c"],["a"],[],[]], x - 1)));
+    fun useSet x = AtomSet.fromList (List.map Atom.atom (List.nth (sampleuse, x - 1)));
+    fun defSet x = AtomSet.fromList (List.map Atom.atom (List.nth (sampledef, x - 1)));
 end;
 
 fun findGenKillbb (x :: blist)=
